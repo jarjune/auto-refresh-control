@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+	</head>
+	<body>
+		<div>
+			url:
+			<textarea id="urlList" style="width: 200px; height: 200px;" placeholder="多个url换行"></textarea>
+		</div>
+		<div>
+			间隔:
+			<input id="interval" type="number" name="" value="5">秒
+			<button onclick="startRefresh()">开启</button>
+			<button onclick="closeRefresh()">关闭</button>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var RefreshWindow = function() {
+
+			this.interval = null
+			this.windowArr = []
+
+			RefreshWindow.prototype.loop = (urlArr) => {
+				for (let i = 0; i < urlArr.length; i++) {
+					this.windowArr[i] = window.open(urlArr[i], 'refreshingWindow' + i, 'height=600, width=600, right=934, top=-258')
+					console.log('refresh url:' + urlArr[i])
+				}
+			}
+
+			RefreshWindow.prototype.start = (urlArr, seconds) => {
+
+				this.close()
+
+				seconds = seconds || 10
+
+				this.loop(urlArr)
+				this.interval = setInterval(() => {
+					this.loop(urlArr)
+				}, seconds * 1000)
+			};
+			RefreshWindow.prototype.close = () => {
+				if (this.interval) {
+					clearInterval(this.interval)
+				}
+				for (let i = 0; i < this.windowArr.length; i++) {
+					this.windowArr[i].close()
+				}
+			};
+		}
+
+		let refresh = new RefreshWindow
+
+		function startRefresh() {
+			let urlStr = document.getElementById('urlList').value
+			let interval = document.getElementById('interval').value
+			let urlArr = urlStr.split('\n')
+			refresh.start(urlArr, interval)
+		}
+		function closeRefresh() {
+			refresh.close()
+		}
+	</script>
+</html>
